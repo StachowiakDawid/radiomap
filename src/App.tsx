@@ -2,13 +2,13 @@ import { usePGlite } from "@electric-sql/pglite-react";
 import { useRef, useState } from "react";
 import { MapContainer, TileLayer } from "react-leaflet";
 import Radiolines from "./Radiolines";
-import { Button, Modal, Spinner } from "react-bootstrap";
+import { Button, Modal, Spinner, Table } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { databaseDictionaries } from "./databaseDictionaries.ts";
 import CellTowers from "./CellTowers";
 import config from "../config";
 import { RadiomapLayer } from "../config.interface.ts";
-import * as Icon from 'react-bootstrap-icons';
+import * as Icon from "react-bootstrap-icons";
 
 function App() {
   const db = usePGlite();
@@ -17,7 +17,8 @@ function App() {
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
-  const [modalContent, setModalContent] = useState<any[]>([]);
+  const [modalContent, setModalContent] = useState<any>({});
+  const [modalContentCount, setModalContentCount] = useState<number>(0);
   const [modalType, setModalType] = useState<RadiomapLayer>(
     RadiomapLayer.Radiolines,
   );
@@ -30,26 +31,26 @@ function App() {
   }
 
   const showModalWithData = (data: any, type: RadiomapLayer) => {
+    const tableData: {
+      [key in keyof typeof databaseDictionaries]: {
+        [key: string]: { id: number; value: string }[];
+      };
+    } = {
+      Radiolines: {},
+      CellTowers: {},
+    };
     if (data.rows.length > 0) {
-      setModalContent(data.rows);
+      for (const key in databaseDictionaries[type]) {
+        tableData[type][key] = data.rows.map((row: any) => ({
+          id: row.id,
+          value: row[key] ?? "",
+        }));
+      }
+      setModalContent(tableData[type]);
+      setModalContentCount(data.rows.length);
       setModalType(type);
       handleShow();
     }
-  };
-
-  const printProperties = (properties: any, type: RadiomapLayer) => {
-    const dictionary = databaseDictionaries[type] as any;
-    const entries = Object.entries(properties)
-      .filter(([key]) => dictionary.hasOwnProperty(key))
-      .map(([key, value]) => {
-        return (
-          <span key={properties.id + key}>
-            <b>{dictionary[key]}:</b> {value?.toString()}
-            <br />
-          </span>
-        );
-      });
-    return entries;
   };
 
   const printModalHeader = (resultsCount: number) => {
@@ -57,14 +58,15 @@ function App() {
     if (rest === 1 && resultsCount !== 11) {
       return `${resultsCount} wynik`;
     } else if (
-      (rest >= 2 && rest <= 4) &&
+      rest >= 2 &&
+      rest <= 4 &&
       !(resultsCount >= 12 && resultsCount <= 14)
     ) {
       return `${resultsCount} wyniki`;
     } else {
       return `${resultsCount} wyników`;
     }
-  }
+  };
 
   return isLoaded ? (
     <>
@@ -97,15 +99,36 @@ function App() {
       </MapContainer>
       <Modal show={show} onHide={handleClose} size="xl">
         <Modal.Header closeButton>
-          <Modal.Title>{printModalHeader(modalContent.length)}</Modal.Title>
+          <Modal.Title>
+            {show && printModalHeader(modalContentCount)}
+          </Modal.Title>
         </Modal.Header>
-        <Modal.Body>
-          {modalContent.map((c, index) => (
-            <span key={modalType + "-" + c.id}>
-              {printProperties(c, modalType)}
-              {index < modalContent.length - 1 && <hr />}
-            </span>
-          ))}
+        <Modal.Body className="overflow-scroll">
+          <Table striped bordered hover>
+            <tbody>
+              {show &&
+                Object.keys(databaseDictionaries[modalType]).map((key) => (
+                  <tr key={modalType + databaseDictionaries[modalType][key]}>
+                    <td>
+                      <b>{databaseDictionaries[modalType][key]}</b>
+                    </td>
+                    {modalContent[key].map(
+                      (value: { id: number; value: string }) => (
+                        <td
+                          key={
+                            modalType +
+                            databaseDictionaries[modalType][key] +
+                            value.id
+                          }
+                        >
+                          {value.value}
+                        </td>
+                      ),
+                    )}
+                  </tr>
+                ))}
+            </tbody>
+          </Table>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>
@@ -114,7 +137,7 @@ function App() {
         </Modal.Footer>
       </Modal>
       <div className="fixed-bottom">
-        <div className="bg-white ms-3" style={{width: "fit-content"}} >
+        <div className="bg-white ms-3" style={{ width: "fit-content" }}>
           <a href="https://github.com/stachowiakdawid/radiomap">
             <Icon.Github /> GitHub
           </a>
