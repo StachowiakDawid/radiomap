@@ -1,4 +1,4 @@
-import { RadiomapLayer } from './config.interface.ts';
+import { DetailsDisplayMode, RadiomapLayer } from './config.interface.ts';
 import type RadiomapConfig  from './config.interface.ts';
 
 const config: RadiomapConfig = {
@@ -7,6 +7,10 @@ const config: RadiomapConfig = {
         [RadiomapLayer.Radiolines]: 1000,
         [RadiomapLayer.CellTowers]: 1000
     },
+    detailsDisplayMode: {
+        [RadiomapLayer.Radiolines]: DetailsDisplayMode.Horizontal,
+        [RadiomapLayer.CellTowers]: DetailsDisplayMode.Vertical
+    }
 };
 
 export default config;

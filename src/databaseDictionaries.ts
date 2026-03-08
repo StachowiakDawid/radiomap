@@ -52,13 +52,13 @@ const cellTowersDatabaseDictionary: { [key: string]: string } = {
   "nr_decyzji": "Numer decyzji",
   "rodz_dec": "Rodzaj decyzji",
   "data_waznosci": "Data ważności",
-  "Dl_geo_stacji": "Długość geograficzna stacji",
-  "Szer_geo_stacji": "Szerokość geograficzna stacji",
+  "typ": "Typ",
+  // "Dl_geo_stacji": "Długość geograficzna stacji",
+  // "Szer_geo_stacji": "Szerokość geograficzna stacji",
   "Miejscowosc": "Miejscowość",
   "Lokalizacja": "Lokalizacja",
   "IdStacji": "Identyfikator stacji",
-  "TERYT": "TERYT",
-  "typ": "Typ",
+  // "TERYT": "TERYT",
   "stan_na_dzien": "Stan na dzień"
 };
 
