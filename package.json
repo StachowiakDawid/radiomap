@@ -10,9 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@electric-sql/pglite": "^0.4.4",
-    "@electric-sql/pglite-postgis": "^0.0.6",
-    "@electric-sql/pglite-react": "^0.3.3",
+    "@electric-sql/pglite": "^0.5.2",
+    "@electric-sql/pglite-postgis": "^0.2.2",
+    "@electric-sql/pglite-react": "^0.4.2",
     "@react-leaflet/core": "^3.0.0",
     "bootstrap": "^5.3.8",
     "puppeteer": "^24.38.0",
